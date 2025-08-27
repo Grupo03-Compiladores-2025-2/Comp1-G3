@@ -10,13 +10,13 @@ bison -d parser/parser.y
 ## Compilar código C
 
 ```
-gcc -o lex.yy.c parser.tab.c -lfl
+gcc -o compilador lex.yy.c parser.tab.c -lfl
 ```
 
 ## Executar programa compilado
 
 ```
-./compilador.out
+./compilador
 ```
 
 
