@@ -20,11 +20,11 @@ while       { printf("KW_WHILE\n"); }
 
 [+\-*/=]   { printf("OPERATOR(%s)\n", yytext); }
 
-/* Criaçao da interpretaçao das operacoes */
-
 [ \t\n]+  { /* Não faz nada */ }
 
 .  { printf("UNKNOWN(%s)\n", yytext); }
+
+/* Criaçao da interpretaçao das operacoes */
 
 [0-9]+ {
     yylval.intValue = atoi(yytext);
