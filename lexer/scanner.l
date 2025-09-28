@@ -1,5 +1,7 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
+#include "parser.tab.h" /* importa as expressoes do parser*/
 %}
 
 /* Definições de padrões de token e ações */
@@ -21,6 +23,24 @@ while       { printf("KW_WHILE\n"); }
 [ \t\n]+  { /* Não faz nada */ }
 
 .  { printf("UNKNOWN(%s)\n", yytext); }
+
+/* Criaçao da interpretaçao das operacoes */
+
+[0-9]+ {
+    yylval.intValue = atoi(yytext);
+    return NUM;
+}
+"+" {return PLUS;}
+"-" {return MINUS;}
+"*" {return TIMES;}
+"/" {return DIVIDE;}
+"(" {return LPAREN;}
+")" {return RPAREN;}
+";" {return SEMI;}
+
+[ \t\n\r]+  { /* Não faz nada */ }
+
+.  { printf("Caracter nao reconhecido:(%s)\n", yytext); }
 
 %%
 
