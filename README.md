@@ -1,4 +1,5 @@
-# Compiladores 1
+# Comp.TXT
+**Compiladores 1**<br>
 **Código da Disciplina**: FGA0003<br>
 **Número do Grupo**: G03<br>
 
@@ -11,8 +12,8 @@ O trabalho é aplicar os conceitos de análise léxica e sintática estudados em
 ## 📌 O Projeto
 
 O trabalho consiste em implementar um compilador, dividido em duas etapas principais:
-1. Analisador Léxico (Lexer) – Responsável por ler o código fonte em Python e quebrá-lo em tokens, utilizando Flex.
-2. Analisador Sintático (Parser) – Utiliza os tokens gerados para verificar se a estrutura do código está de acordo com a gramática definida, e em seguida traduz o código para a linguagem C, utilizando Bison.
+1. Analisador Léxico (Lexer) – Responsável por ler o código fonte na linguagem C e quebrá-lo em tokens, utilizando Flex.
+2. Analisador Sintático (Parser) – Utiliza os tokens gerados para verificar se a estrutura do código está de acordo com a gramática definida, e em seguida traduz o código para a linguagem Python, utilizando Bison.
 
 ## ⚙️ Compilação e Execução
 
@@ -20,7 +21,7 @@ Para compilar e rodar o projeto, é necessário ter instalado:
 - Flex – para geração do analisador léxico
 - Bison – para geração do analisador sintático
 - GCC – para compilação do código em C
-- 
+  
 ### 1. Compilar arquivos Flex e Bison
 
 ```
