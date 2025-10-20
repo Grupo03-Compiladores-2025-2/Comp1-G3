@@ -1,8 +1,11 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser.tab.h" /* importa as definições de tokens do parser (Bison)*/
+#include "parser.tab.h"  /* importa tokens do parser */
 %}
+
+/* Habilita contador de linhas interno do Flex */
+%option yylineno
 
 %%
 
@@ -21,24 +24,26 @@
 
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.strValue = strdup(yytext); return IDENT; }
 
-[0-9]+                  { yylval.intValue = atoi(yytext); return NUM; }
 [0-9]+"."[0-9]+         { yylval.floatValue = atof(yytext); return FLOAT; }
+[0-9]+                  { yylval.intValue = atoi(yytext); return NUM; }
 
 "+" { return PLUS; }
 "-" { return MINUS; }
 "*" { return TIMES; }
 "/" { return DIVIDE; }
+"%" { return MOD; }
 
 "=="    { return EQ; }
 "!="    { return NEQ; }
-">"     { return GT; }
-"<"     { return LT; }
 ">="    { return GE; }
 "<="    { return LE; }
+">"     { return GT; }
+"<"     { return LT; }
 
 "&&"    { return AND; }
 "||"    { return OR; }
 "!"     { return NOT; }
+"="     { return ASSIGN; }
 
 "(" { return LPAREN; }
 ")" { return RPAREN; }
@@ -47,19 +52,14 @@
 ";" { return SEMI; }
 "," { return COMMA; }
 
-[ \t\n\r]+  { /* Ignorar */ }
+[ \t]+          { /* ignora espaços */ }
+\n              { /* Flex já incrementa yylineno automaticamente */ }
+"#".*            { /* ignora diretivas C */ }
 
-. { printf("Token desconhecido: %s\n", yytext); }
+. { printf("Token desconhecido: %s (linha %d)\n", yytext, yylineno); }
 
 %%
 
-/* --- FIM DE ARQUIVO --- */
 int yywrap(void) {
     return 1;
-}
-
-/* --- FUNÇÃO PRINCIPAL (EXECUTA O ANALISADOR LÉXICO) --- */
-int main(void) {
-    yylex();
-    return 0;
 }
