@@ -1,56 +1,65 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser.tab.h" /* importa as expressoes do parser*/
+#include "parser.tab.h"  /* importa tokens do parser */
 %}
 
-/* Definições de padrões de token e ações */
-%%
-
-if          { printf("KW_IF\n"); }
-while       { printf("KW_WHILE\n"); }
-
-"//".*     { /* Ignorar comentários de linha */ }
-
-"/*"([^*]|\*+[^*/])*\*+\/    { /* Ignorar comentários de bloco */ }
-
-[a-zA-Z_][a-zA-Z0-9_]*  { printf("IDENT(%s)\n", yytext); }
-
-[0-9]+(\.[0-9]+)?  { printf("NUMBER(%s)\n", yytext); }
-
-[+\-*/=]   { printf("OPERATOR(%s)\n", yytext); }
-
-[ \t\n]+  { /* Não faz nada */ }
-
-.  { printf("UNKNOWN(%s)\n", yytext); }
-
-/* Criaçao da interpretaçao das operacoes */
-
-[0-9]+ {
-    yylval.intValue = atoi(yytext);
-    return NUM;
-}
-"+" {return PLUS;}
-"-" {return MINUS;}
-"*" {return TIMES;}
-"/" {return DIVIDE;}
-"(" {return LPAREN;}
-")" {return RPAREN;}
-";" {return SEMI;}
-
-[ \t\n\r]+  { /* Não faz nada */ }
-
-.  { printf("Caracter nao reconhecido:(%s)\n", yytext); }
+/* Habilita contador de linhas interno do Flex */
+%option yylineno
 
 %%
 
-/* Função auxiliar do Flex (quando termina o arquivo de entrada) */
+"if"        { return KW_IF; }
+"while"     { return KW_WHILE; }
+"for"       { return KW_FOR; }
+"return"    { return KW_RETURN; }
+"int"       { return KW_INT; }
+"float"     { return KW_FLOAT; }
+"void"      { return KW_VOID; }
+"printf"    { return KW_PRINTF; }
+"scanf"     { return KW_SCANF; }
+
+"//".*                      { /* Ignora comentários de linha */ }
+"/*"([^*]|\*+[^*/])*\*+\/   { /* Ignora comentários de bloco */ }
+
+[a-zA-Z_][a-zA-Z0-9_]*  { yylval.strValue = strdup(yytext); return IDENT; }
+
+[0-9]+"."[0-9]+         { yylval.floatValue = atof(yytext); return FLOAT; }
+[0-9]+                  { yylval.intValue = atoi(yytext); return NUM; }
+
+"+" { return PLUS; }
+"-" { return MINUS; }
+"*" { return TIMES; }
+"/" { return DIVIDE; }
+"%" { return MOD; }
+
+"=="    { return EQ; }
+"!="    { return NEQ; }
+">="    { return GE; }
+"<="    { return LE; }
+">"     { return GT; }
+"<"     { return LT; }
+
+"&&"    { return AND; }
+"||"    { return OR; }
+"!"     { return NOT; }
+"="     { return ASSIGN; }
+
+"(" { return LPAREN; }
+")" { return RPAREN; }
+"{" { return LBRACE; }
+"}" { return RBRACE; }
+";" { return SEMI; }
+"," { return COMMA; }
+
+[ \t]+          { /* ignora espaços */ }
+\n              { /* Flex já incrementa yylineno automaticamente */ }
+"#".*            { /* ignora diretivas C */ }
+
+. { printf("Token desconhecido: %s (linha %d)\n", yytext, yylineno); }
+
+%%
+
 int yywrap(void) {
     return 1;
-}
-
-/* Função principal: executa o analisador léxico */
-int main(void) {
-    yylex();
-    return 0;
 }
