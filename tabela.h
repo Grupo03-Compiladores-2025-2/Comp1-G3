@@ -1,14 +1,16 @@
 #ifndef TABELA_H
 #define TABELA_H
 
+#include "ast.h"
+
 typedef struct simbolo
 {
   char nome[32];
-  char tipo[16];
-  struct simbolo *prox;
+  Tipo tipo;
+  struct simbolo *proximo;
 } Simbolo;
 
-void inserirSimbolo(char *nome, char *tipo);
+void inserirSimbolo(char *nome, Tipo tipo);
 Simbolo *buscarSimbolo(char *nome);
 void imprimirTabela();
 
