@@ -1,42 +1,37 @@
-#include "tabela.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ast.h"
+#include "tabela.h"
 
-Simbolo *tabela = NULL;
+#define TAM 211
 
-void inserirSimbolo(char *nome, char *tipo)
+Simbolo *tabela[TAM];
+
+unsigned hash(char *s)
 {
+  unsigned h = 0;
+  while (*s)
+  {
+    h = (h << 4) + *s++;
+  }
+  return h % TAM;
+}
 
-  Simbolo *s = tabela;
-  while (s)
-  {
-    if (strcmp(s->nome, nome) == 0)
-      return;
-    s = s->prox;
-  }
-  Simbolo *novo = malloc(sizeof(Simbolo));
-  strcpy(novo->nome, nome);
-  strcpy(novo->tipo, tipo);
-  novo->prox = NULL;
-  if (tabela == NULL)
-  {
-    tabela = novo;
-  }
-  else
-  {
-    Simbolo *last = tabela;
-    while (last->prox)
-    {
-      last = last->prox;
-    }
-    last->prox = novo;
-  }
+void inserirSimbolo(char *nome, Tipo tipo)
+{
+  unsigned i = hash(nome);
+  Simbolo *s = malloc(sizeof(Simbolo));
+  strcpy(s->nome, nome);
+  s->tipo = tipo;
+  s->proximo = tabela[i];
+  tabela[i] = s;
 }
 
 Simbolo *buscarSimbolo(char *nome)
 {
-  for (Simbolo *s = tabela; s; s = s->prox)
+  unsigned i = hash(nome);
+  for (Simbolo *s = tabela[i]; s; s = s->proximo)
   {
     if (strcmp(s->nome, nome) == 0)
     {
@@ -48,9 +43,11 @@ Simbolo *buscarSimbolo(char *nome)
 
 void imprimirTabela()
 {
-  printf("\nTabela de Símbolos:\n");
-  for (Simbolo *s = tabela; s; s = s->prox)
+  for (int i = 0; i < TAM; i++)
   {
-    printf("Nome: %s, Tipo: %s\n", s->nome, s->tipo);
+    for (Simbolo *s = tabela[i]; s; s = s->proximo)
+    {
+      printf("Nome: %s, Tipo: %s\n", s->nome, s->tipo == TIPO_INT ? "int" : "float");
+    }
   }
 }
