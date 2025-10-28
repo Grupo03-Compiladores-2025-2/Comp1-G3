@@ -1,51 +1,63 @@
-#include "ast.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ast.h"
 
-NoAST *criarNoNum(int valor)
+NoAST *criarNoOp(char op, NoAST *esq, NoAST *dir)
 {
-  NoAST *novo = malloc(sizeof(NoAST));
-  novo->operador = ' ';
-  novo->valor = valor;
-  novo->esquerda = novo->direita = NULL;
-  return novo;
+  NoAST *no = malloc(sizeof(NoAST));
+  no->operador = op;
+  no->esquerda = esq;
+  no->direita = dir;
+  no->tipo = (esq->tipo == dir->tipo) ? esq->tipo : TIPO_ERRO;
+  return no;
 }
 
-NoAST *criarNoId(char *nome)
+NoAST *criarNoNum(int val)
 {
-  NoAST *novo = malloc(sizeof(NoAST));
-  novo->operador = ' ';
-  strcpy(novo->nome, nome);
-  novo->esquerda = novo->direita = NULL;
-  return novo;
+  NoAST *no = malloc(sizeof(NoAST));
+  no->valor = val;
+  no->operador = 0;
+  no->tipo = TIPO_INT;
+  no->esquerda = no->direita = NULL;
+  return no;
 }
 
-NoAST *criarNoOp(char operador, NoAST *esq, NoAST *dir)
+NoAST *criarNoId(char *nome, Tipo tipo)
 {
-  NoAST *novo = malloc(sizeof(NoAST));
-  novo->operador = operador;
-  novo->esquerda = esq;
-  novo->direita = dir;
-  return novo;
+  NoAST *no = malloc(sizeof(NoAST));
+  strcpy(no->nome, nome);
+  no->operador = 0;
+  no->tipo = tipo;
+  no->esquerda = no->direita = NULL;
+  return no;
 }
 
-void ImprimirAST(NoAST *raiz)
+void ImprimirAST(NoAST *no)
 {
-  if (raiz->operador == ' ')
+  if (!no)
   {
-    printf("%d", raiz->valor);
+    return;
   }
-  else if (raiz->operador == 'i')
+  if (no->operador)
   {
-    printf("%s", raiz->nome);
+    printf("(");
+    imprimirAST(no->esquerda);
+    printf(" %c ", no->operador);
+    imprimirAST(no->direita);
+    printf(")");
+  }
+  else if (strlen(no->nome) > 0)
+  {
+    printf("%s", no->nome);
   }
   else
   {
-    printf("(");
-    imprimirAST(raiz->esquerda);
-    printf(" %c ", raiz->operador);
-    imprimirAST(raiz->direita);
-    printf(")");
+    printf("%d", no->valor);
   }
+}
+
+int TiposCompativeis(Tipo t1, Tipo t2)
+{
+  return t1 == t2;
 }

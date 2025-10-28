@@ -1,8 +1,6 @@
 #ifndef AST_H
 #define AST_H
 
-#include "tipos.h"
-
 typedef enum
 {
   TIPO_INT,
