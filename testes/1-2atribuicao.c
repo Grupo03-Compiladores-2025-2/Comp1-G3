@@ -2,7 +2,7 @@
 
 int main(){
 
-    // Atribuir valores inteiros
+    // Atribuir valores
 
     int valor;
 

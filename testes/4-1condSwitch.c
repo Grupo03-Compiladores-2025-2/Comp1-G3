@@ -2,9 +2,10 @@
 
 int main(){
 
-    // Condicionais 2 (Switch)
+    // Condicionais 4 (Switch)
 
-    int num1 = 4, num2;
+    int num1 = 4;
+    int num2;
 
     switch( num1 ){
 

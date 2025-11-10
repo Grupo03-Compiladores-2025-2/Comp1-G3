@@ -2,13 +2,12 @@
 
 int main(){
 
-    // Estrutura de Repeticao 3 (Do..While)
+    // Estrutura de Repeticao 2 (Do..While)
 
     int num2 = 1;
 
-    do
-    {
-         num2++;
+    do{
+        num2++;
 
     } while(num2 < 3);
  

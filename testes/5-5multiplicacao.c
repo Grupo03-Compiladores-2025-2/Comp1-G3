@@ -4,7 +4,9 @@ int main(){
 
     // Multiplicacao de numeros inteiros
 
-    int num1 = 4, num2 = 2, multiplicacao;
+    int num1 = 4;
+    int num2 = 2;
+    int multiplicacao;
 
     multiplicacao = num1 * num2;
  
