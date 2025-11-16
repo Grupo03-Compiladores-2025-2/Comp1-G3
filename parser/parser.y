@@ -71,52 +71,17 @@ program:
   | program function
   ;
 
-tipo_no_void:
-    KW_INT
-  | KW_FLOAT
-  ;
-
-tipo:
-    tipo_no_void
-  | KW_VOID
-  ;
-
-decl:
-    tipo_no_void decl_var_list
-  ;
-
-decl_list:
-    decl_list COMMA decl
-  | decl
-  ;
-
-decl_var:
-    IDENT ASSIGN expr
-  | IDENT
-  ;
-
-decl_var_list:
-    decl_var_list COMMA dec_var
-  | decl_var
-  ;
-
-
-function_def:
-    tipo IDENT LPAREN RPAREN LBRACE stmt_list RBRACE
+function:
+    KW_INT IDENT LPAREN RPAREN LBRACE stmt_list RBRACE
         {
             printf("def %s():\n%s\n", $2, indent($6, 1));
             free($2); free($6);
         }
-  | tipo IDENT LPAREN decl_list RPAREN LBRACE stmt_list RBRACE
+  | KW_VOID IDENT LPAREN RPAREN LBRACE stmt_list RBRACE
         {
             printf("def %s():\n%s\n", $2, indent($6, 1));
             free($2); free($6);
         }
-  ;
-
-function_call:
-    IDENT LPAREN RPAREN
-  | IDENT LPAREN expr_list RPAREN
   ;
 
 stmt_list:
@@ -138,7 +103,6 @@ stmt:
             sprintf($$, "if %s:\n%s", $3, indent($6,1));
             free($3); free($6);
         }
-  | KW_IF LPAREN expr RPAREN LBRACE stmt_list RBRACE 
   | KW_WHILE LPAREN expr RPAREN LBRACE stmt_list RBRACE
         {
             int len = strlen($3) + strlen($6) + 32;
@@ -169,7 +133,36 @@ stmt:
         }
 
     /* Declaração com atribuição */
-  | decl_list SEMI
+  | KW_INT IDENT ASSIGN expr SEMI
+        {
+            int len = strlen($2) + strlen($4) + 10;
+            $$ = malloc(len);
+            sprintf($$, "%s = %s\n", $2, $4);
+            free($2); free($4);
+        }
+  | KW_FLOAT IDENT ASSIGN expr SEMI
+        {
+            int len = strlen($2) + strlen($4) + 10;
+            $$ = malloc(len);
+            sprintf($$, "%s = float(%s)\n", $2, $4);
+            free($2); free($4);
+        }
+
+    /* Declaração sem atribuição */
+  | KW_INT IDENT SEMI
+        {
+            int len = strlen($2) + 4;
+            $$ = malloc(len);
+            sprintf($$, "%s = 0\n", $2); // inicializa com 0
+            free($2);
+        }
+  | KW_FLOAT IDENT SEMI
+        {
+            int len = strlen($2) + 6;
+            $$ = malloc(len);
+            sprintf($$, "%s = 0.0\n", $2); // inicializa com 0.0
+            free($2);
+        }
 
     /* Atribuição simples */
   | IDENT ASSIGN expr SEMI
@@ -203,7 +196,6 @@ expr:
             sprintf(buffer, "%f", $1);
             $$ = strdup(buffer);
         }
-  | function_call
   | IDENT
         { $$ = strdup($1); free($1); }
   | expr PLUS expr
@@ -216,11 +208,6 @@ expr:
         { $$ = malloc(strlen($1)+strlen($3)+4); sprintf($$, "%s / %s", $1, $3); free($1); free($3); }
   | expr MOD expr
         { $$ = malloc(strlen($1)+strlen($3)+4); sprintf($$, "%s %% %s", $1, $3); free($1); free($3); }
-  ;
-
-expr_list:
-    expr_list COMMA expr
-  | expr
   ;
 
 %%
