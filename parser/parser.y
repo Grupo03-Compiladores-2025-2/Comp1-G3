@@ -208,6 +208,24 @@ expr:
         { $$ = malloc(strlen($1)+strlen($3)+4); sprintf($$, "%s / %s", $1, $3); free($1); free($3); }
   | expr MOD expr
         { $$ = malloc(strlen($1)+strlen($3)+4); sprintf($$, "%s %% %s", $1, $3); free($1); free($3); }
+  | expr EQ expr
+        { $$ = malloc(strlen($1)+strlen($3)+5); sprintf($$, "%s == %s", $1, $3); free($1); free($3); }
+  | expr NEQ expr
+        { $$ = malloc(strlen($1)+strlen($3)+5); sprintf($$, "%s != %s", $1, $3); free($1); free($3); }
+  | expr GE expr
+        { $$ = malloc(strlen($1)+strlen($3)+5); sprintf($$, "%s >= %s", $1, $3); free($1); free($3); }
+  | expr LE expr
+        { $$ = malloc(strlen($1)+strlen($3)+5); sprintf($$, "%s <= %s", $1, $3); free($1); free($3); }
+  | expr GT expr
+        { $$ = malloc(strlen($1)+strlen($3)+4); sprintf($$, "%s > %s", $1, $3); free($1); free($3); }
+  | expr LT expr
+        { $$ = malloc(strlen($1)+strlen($3)+4); sprintf($$, "%s < %s", $1, $3); free($1); free($3); }
+  | NOT expr
+        { $$ = malloc(strlen($2)+5); sprintf($$, "not %s", $2); free($2); }
+  | expr OR expr
+        { $$ = malloc(strlen($1)+strlen($3)+5); sprintf($$, "%s or %s", $1, $3); free($1); free($3); }
+  | expr AND expr
+        { $$ = malloc(strlen($1)+strlen($3)+6); sprintf($$, "%s and %s", $1, $3); free($1); free($3); }
   ;
 
 %%
