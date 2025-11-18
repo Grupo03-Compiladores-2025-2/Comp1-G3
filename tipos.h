@@ -7,7 +7,7 @@ typedef struct noAST
   int valor;
   char nome[32];
   struct noAST *esquerda;
-  struct noAST *direita
+  struct noAST *direita;
 } NoAST;
 
 #endif
