@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "ast.h"
+#include "tabela.h"
 
 extern int yylex(void);
 extern FILE *yyin;
 extern int yylineno;
 
 void yyerror(const char *s);
-
+NoAST *raiz;
 /* Função para identar código Python */
 char* indent(const char* code, int level) {
     int len = strlen(code);
@@ -35,6 +37,7 @@ char* indent(const char* code, int level) {
     int intValue;
     float floatValue;
     char *strValue;
+    NoAST *no;
 }
 
 /* ===== TOKENS ===== */
@@ -51,6 +54,8 @@ char* indent(const char* code, int level) {
 %token AND OR NOT
 %token ASSIGN
 %token LPAREN RPAREN LBRACE RBRACE SEMI COMMA
+
+%type <no> expr stmt
 
 /* ===== PRIORIDADES ===== */
 %left OR
