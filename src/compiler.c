@@ -379,8 +379,26 @@ void generatePython(ASTNode *node, int indentLevel)
         printf(")");
         break;
 
+    case NODE_UNARY_OP:
+        printf("(");
+
+        if (strcmp(node->op, "!") == 0)
+        {
+            printf("not ");
+        }
+
+        if (node->left)
+            generatePython(node->left, 0);
+
+        printf(")");
+        break;
+
     case NODE_CONST_INT:
         printf("%d", node->intVal);
+        break;
+
+    case NODE_CONST_FLOAT:
+        printf("%f", node->floatVal);
         break;
 
     case NODE_CONST_STRING:
@@ -417,6 +435,11 @@ void generatePython(ASTNode *node, int indentLevel)
             generatePython(node->else_body, indentLevel);
         break;
     }
+    if (node->type != NODE_IF && node->type != NODE_FOR && node->type != NODE_WHILE && node->type != NODE_SWITCH && node->type != NODE_VAR_DECL_LIST)
+    {
+        if (node->next)
+            generatePython(node->next, indentLevel);
+    }
 }
 
 /* ===========================================================
@@ -441,7 +464,7 @@ int main(int argc, char **argv)
 
     if (yyparse() != 0)
     {
-        fprintf(stderr, "\nERRO FATAL: Falha na análise sintatica (Parser).\n");
+        fprintf(stderr, "\nERRO FATAL: Falha na analise sintatica (Parser).\n");
         freeSymbolTable();
         return 1;
     }

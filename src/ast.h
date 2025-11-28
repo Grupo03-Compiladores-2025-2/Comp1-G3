@@ -23,6 +23,7 @@ typedef enum
     NODE_BIN_OP,
     NODE_CONST_INT,
     NODE_CONST_FLOAT,
+    NODE_UNARY_OP,
     NODE_VAR_USE,
     NODE_SWITCH,
     NODE_CONST_STRING,

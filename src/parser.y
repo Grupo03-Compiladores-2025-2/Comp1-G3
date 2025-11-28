@@ -1,3 +1,9 @@
+/*
+ * Este arquivo (parser.y) implementa o Analisador Sintático (Parser) do compilador 
+ * utilizando Bison. Ele define a gramática da linguagem C simplificada,
+ * constrói a Árvore de Sintaxe Abstrata (AST) e lida com a precedência de operadores.
+ */
+
 %{
     #include <stdio.h>
     #include <stdlib.h>
@@ -12,6 +18,9 @@
     ASTNode* root = NULL;
 %}
 
+/* -----------------------------------------------------------
+ * UNION: Definição dos Tipos dos Símbolos
+ * ----------------------------------------------------------- */
 %union {
     int intValue;
     float floatValue;
@@ -19,51 +28,74 @@
     struct ASTNode* node;
 }
 
-/* Tokens */
+/* -----------------------------------------------------------
+ * TOKENS (Terminais)
+ * ----------------------------------------------------------- */
+
+/* Identificadores e Constantes */
 %token <strValue> IDENT
 %token <strValue> STRING_LITERAL
 %token <intValue> NUM
 %token <floatValue> FLOAT
 
+/* Palavras-Chave */
 %token KW_IF KW_ELSE KW_WHILE KW_FOR KW_RETURN KW_INT KW_FLOAT KW_VOID KW_PRINTF KW_SCANF
 %token KW_SWITCH KW_CASE KW_DEFAULT KW_BREAK
+%token KW_DO
+
+/* Operadores */
 %token EQ NEQ GE LE GT LT AND OR NOT ASSIGN
 %token PLUS MINUS TIMES DIVIDE MOD 
+%token INC_OP DEC_OP
+%token AMPERSAND
+
+/* Delimitadores */
 %token LPAREN RPAREN LBRACE RBRACE SEMI COMMA
 %token COLON
-%token AMPERSAND
-%token KW_DO
-%token INC_OP DEC_OP
 
+/* -----------------------------------------------------------
+ * TIPOS NÃO-TERMINAIS
+ * ----------------------------------------------------------- */
 %type <node> program statement_list statement expression var_decl declaration_list declaration case_list case_clause
 %type <node> simple_assign_stmt simple_incr_decr_stmt 
 
+/* -----------------------------------------------------------
+ * PRECEDÊNCIA E ASSOCIATIVIDADE
+ * ----------------------------------------------------------- */
 %left OR
 %left AND
 %left EQ NEQ GT LT GE LE
 %left PLUS MINUS
 %left TIMES DIVIDE MOD
-%nonassoc NOT
+%right NOT /* Operador Unário (maior precedência) */
 
 %start program
 
 %%
 
-/* Programa */
+/* ===========================================================
+ * G R A M Á T I C A
+ * =========================================================== */
+
+/* ---------------------- PROGRAMA ------------------------- */
+
 program:
       KW_VOID IDENT LPAREN RPAREN LBRACE statement_list RBRACE { $$ = $6; root = $$; }
     | KW_INT IDENT LPAREN RPAREN LBRACE statement_list RBRACE  { $$ = $6; root = $$; }
-    | LBRACE statement_list RBRACE                             { $$ = $2; root = $$; }
+    | LBRACE statement_list RBRACE                            { $$ = $2; root = $$; }
     ;
 
-/* Lista de statements */
+/* ---------------------- STATEMENT LIST ------------------- */
+
 statement_list:
       statement statement_list { $1->next = $2; $$ = $1; }
     | /* vazio */              { $$ = NULL; }
     ;
 
-/* Statements */
+/* ---------------------- STATEMENTS ----------------------- */
+
 statement:
+      /* Declaração e Atribuição */
       var_decl SEMI { $$ = $1; }
     | IDENT ASSIGN expression SEMI {
           $$ = createNode(NODE_ASSIGN);
@@ -78,6 +110,8 @@ statement:
           $$ = createNode(NODE_DECREMENT);
           $$->id = $1;
       }
+      
+      /* I/O */
     | KW_PRINTF LPAREN expression RPAREN SEMI {
           $$ = createNode(NODE_PRINTF);
           $$->left = $3;
@@ -87,6 +121,8 @@ statement:
           $$->left = $3;
           $$->right = $5;
       }
+      
+      /* Estruturas de Controle: IF */
     | KW_IF LPAREN expression RPAREN LBRACE statement_list RBRACE {
           $$ = createNode(NODE_IF);
           $$->condition = $3;
@@ -98,6 +134,14 @@ statement:
           $$->left = $6;
           $$->else_body = $10;
       }
+    | KW_IF LPAREN expression RPAREN LBRACE statement_list RBRACE KW_ELSE statement {
+          $$ = createNode(NODE_IF);
+          $$->condition = $3;
+          $$->left = $6;
+          $$->else_body = $9; /* CORRIGIDO: $9 é o statement subsequente ('if') */
+      }
+      
+      /* Estruturas de Controle: LOOPS */
     | KW_WHILE LPAREN expression RPAREN LBRACE statement_list RBRACE {
           $$ = createNode(NODE_WHILE);
           $$->condition = $3;
@@ -109,15 +153,16 @@ statement:
           $$->left = $3;
           $$->op = strdup("do_while");
       }
-    // REGRA FOR CORRIGIDA: Usa regras auxiliares e gerencia SEMI
     | KW_FOR LPAREN simple_assign_stmt SEMI expression SEMI simple_incr_decr_stmt RPAREN LBRACE statement_list RBRACE {
           $$ = createNode(NODE_FOR);
           $$->init_stmt = $3;
           $$->condition = $5; 
           $$->incr_stmt = $7;
-          $$->left = $10;     
+          $$->left = $10;       
       }
-    | KW_RETURN expression SEMI { // <-- CORRIGIDO: Removida a linha duplicada
+      
+      /* Estruturas de Controle: SWITCH/BREAK/RETURN */
+    | KW_RETURN expression SEMI { 
           $$ = createNode(NODE_RETURN);
           $$->left = $2;
       }
@@ -129,7 +174,7 @@ statement:
     | KW_BREAK SEMI { $$ = createNode(NODE_BREAK); }
     ;
 
-/* ---------- REGRAS AUXILIARES PARA FOR (SEM PONTO E VÍRGULA) ---------- */
+/* ---------------------- REGRAS AUXILIARES PARA FOR ----------------------- */
 
 simple_assign_stmt:
       IDENT ASSIGN expression {
@@ -137,10 +182,10 @@ simple_assign_stmt:
           $$->id = $1;
           $$->right = $3;
       }
-    | var_decl { // Permite declaração na inicialização do for (ex: for(int i=0;...))
-          $$ = $1;
+    | var_decl { 
+          $$ = $1; /* Permite declaração na inicialização (e.g., int i=0) */
       }
-    | /* vazio */ { $$ = NULL; } // Permite inicialização vazia (ex: for(;...;...))
+    | /* vazio */ { $$ = NULL; } 
     ;
 
 simple_incr_decr_stmt:
@@ -152,20 +197,20 @@ simple_incr_decr_stmt:
           $$ = createNode(NODE_DECREMENT);
           $$->id = $1;
       }
-    | IDENT ASSIGN expression { // Permite reatribuição no incremento (ex: i = i + 1)
+    | IDENT ASSIGN expression { 
           $$ = createNode(NODE_ASSIGN);
           $$->id = $1;
           $$->right = $3;
       }
-    | /* vazio */ { $$ = NULL; } // Permite incremento vazio (ex: for(...;...;))
+    | /* vazio */ { $$ = NULL; } 
     ;
 
 
-/* ---------- CASE LIST e CASE CLAUSE ---------- */
+/* ---------------------- SWITCH/CASE/DEFAULT ----------------------- */
 
 case_list:
       case_clause case_list { $1->next = $2; $$ = $1; }
-    | /* vazio */            { $$ = NULL; }
+    | /* vazio */           { $$ = NULL; }
     ;
 
 case_clause:
@@ -176,17 +221,17 @@ case_clause:
       }
     | KW_DEFAULT COLON statement_list {
           $$ = createNode(NODE_CASE);
-          $$->condition = NULL; /* sinaliza default */
+          $$->condition = NULL; /* Sinaliza default */
           $$->left = $3;
       }
     ;
 
-/* ---------- DECLARAÇÃO DE VARIÁVEIS COM VÍRGULA ---------- */
+/* ---------------------- DECLARAÇÃO DE VARIÁVEIS ----------------------- */
 
 var_decl:
       KW_INT declaration_list {
-          $$ = createNode(NODE_VAR_DECL_LIST); // Cria o nó container
-          $$->left = $2; // Aponta left para o início da lista de declarações
+          $$ = createNode(NODE_VAR_DECL_LIST); 
+          $$->left = $2; 
           
           ASTNode *tmp = $2;
           while (tmp) {
@@ -195,8 +240,8 @@ var_decl:
           }
       }
     | KW_FLOAT declaration_list {
-          $$ = createNode(NODE_VAR_DECL_LIST); // Cria o nó container
-          $$->left = $2; // Aponta left para o início da lista de declarações
+          $$ = createNode(NODE_VAR_DECL_LIST); 
+          $$->left = $2; 
           
           ASTNode *tmp = $2;
           while (tmp) {
@@ -206,7 +251,6 @@ var_decl:
       }
     ;
 
-/* Lista de declarações separadas por vírgula */
 declaration_list:
       declaration { $$ = $1; }
     | declaration COMMA declaration_list {
@@ -215,7 +259,6 @@ declaration_list:
       }
     ;
 
-/* declaração unitária: IDENT ou IDENT = expression */
 declaration:
       IDENT {
           $$ = createNode(NODE_VAR_DECL);
@@ -228,8 +271,10 @@ declaration:
       }
     ;
 
-/* ---------- EXPRESSÕES ---------- */
+/* ---------------------- EXPRESSÕES ----------------------- */
+
 expression:
+      /* Constantes e Variáveis */
       STRING_LITERAL { 
           $$ = createNode(NODE_CONST_STRING);
           $$->id = $1;
@@ -246,10 +291,20 @@ expression:
           $$ = createNode(NODE_VAR_USE);
           $$->id = $1;
       }
-    | AMPERSAND IDENT {
+    | AMPERSAND IDENT { /* Endereço de (&) */
           $$ = createNode(NODE_ADDRESS_OF);
           $$->id = $2;
       }
+      
+      /* Agrupamento e Unário */
+    | LPAREN expression RPAREN { $$ = $2; }
+    | NOT expression { 
+          $$ = createNode(NODE_UNARY_OP); 
+          $$->left = $2; 
+          $$->op = strdup("!"); 
+      }
+    
+      /* Operadores Binários (Aritméticos, Relacionais, Lógicos) */
     | expression PLUS expression {
           $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("+");
       }
@@ -265,16 +320,6 @@ expression:
     | expression MOD expression {
           $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("%%");
       }
-    
-    // --- OPERADORES LÓGICOS (NOVOS) ---
-    | expression AND expression { 
-          $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("and");
-      }
-    | expression OR expression { 
-          $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("or");
-      }
-    
-    // --- OPERADORES RELACIONAIS ---
     | expression EQ expression {
           $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("==");
       }
@@ -293,8 +338,12 @@ expression:
     | expression LE expression {
           $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("<=");
       }
-    
-    | LPAREN expression RPAREN { $$ = $2; }
+    | expression AND expression { 
+          $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("and");
+      }
+    | expression OR expression { 
+          $$ = createNode(NODE_BIN_OP); $$->left = $1; $$->right = $3; $$->op = strdup("or");
+      }
     ;
 
 %%
