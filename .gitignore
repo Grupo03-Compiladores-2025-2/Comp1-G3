@@ -1,12 +1,6 @@
-# arquivos sem extensão
-*
-!/**/
-!*.*
-!Makefile
-
-# Arquivos Gerados
-
-*.tab.c
-*.tab.h
-lex.yy.c
+build/
+src/generated/
+*.exe
+*.o
 *.out
+*.log
