@@ -1,44 +1,84 @@
-# Comp.TXT
-**Compiladores 1**<br>
-**Código da Disciplina**: FGA0003<br>
-**Número do Grupo**: G03<br>
+# Comp.TXT – Compilador C → Python 3
 
-Este repositório é para o projeto desenvolvido pelo grupo 3 na disciplina de Compiladores 1.
-O trabalho é aplicar os conceitos de análise léxica e sintática estudados em sala, implementando um compilador que traduz programas escritos em Python para programas equivalentes em C.
+O Comp.TXT é um compilador desenvolvido pelo Grupo G03 na disciplina de Compiladores (FGA0003). Seu propósito é traduzir programas escritos em C para código equivalente em Python 3, seguindo o fluxo clássico de compilação: análise léxica, análise sintática, geração de AST, análise semântica e geração de código.
 
-## 👥 Membros do grupo
-<center> <table style="width: 100%;"> <tr> <td align="center"> <a href="https://github.com/CarlosEduardoMendesdeMesquita"> <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/58157127?v=4" width="100px;" alt="Carlos"/> <br/> <sub><b>Carlos Eduardo Mendes de Mesquita</b></sub> <br/> </a> <sub><b>190085584</b></sub> </td> <td align="center"> <a href="https://github.com/eric-kingu"> <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/56442048?v=4" width="100px;" alt="Eric"/> <br/> <sub><b>Eric Akio Lages Nishimura</b></sub> <br/> </a> <sub><b>190105895</b></sub> </td> <td align="center"> <a href="https://github.com/EstherSousa"> <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/91230616?v=4" width="100px;" alt="Esther"/> <br/> <sub><b>Esther Silva Cardoso de Sousa</b></sub> <br/> </a> <sub><b>190106034</b></sub> </td> <td align="center"> <a href="https://github.com/Laisczt"> <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/92321749?v=4" width="100px;" alt="Laís"/> <br/> <sub><b>Laís Cecília Soares Paes</b></sub> <br/> </a> <sub><b>211029512</b></sub> </td> <td align="center"> <a href="https://github.com/Yvestxt"> <img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/73966483?v=4" width="100px;" alt="Yves"/> <br/> <sub><b>Yves Gustavo Ribeiro Pimenta</b></sub> <br/> </a> <sub><b>190097043</b></sub> </td> </tr> </table> </center>
+O resultado final é um código Python fiel à lógica original e totalmente executável.
 
-## 📌 O Projeto
+## 👥 Equipe de Desenvolvimento
+<table><thead><tr><th></th><th>Nome</th><th>Matrícula</th><th>Principais Contribuições</th></tr></thead><tbody><tr><td><img src="https://avatars.githubusercontent.com/u/58157127?v=4" alt="Image" width="80" height="80"></td><td>Carlos Eduardo Mendes de Mesquita</td><td>190085584</td><td>Desenvolvimento da Análise Léxica e Sintática,<br>Implementação da Tabela de Símbolos.</td></tr><tr><td><img src="https://avatars.githubusercontent.com/u/56442048?v=4" alt="Image" width="80" height="80"></td><td>Eric Akio Lages Nishimura</td><td>190105895</td><td>Definição de Escopo do Projeto,<br>Desenvolvimento da Análise Léxica.</td></tr><tr><td><img src="https://avatars.githubusercontent.com/u/91230616?v=4" width="80" height="80"></td><td>Esther Silva Cardoso de Sousa</td><td>190106034</td><td>Desenvolvimento de Testes Positivos<br>Testes Negativos, Ajustes de Testes.</td></tr>
+<tr><td><img src="https://avatars.githubusercontent.com/u/92321749?v=4" alt="Image" width="80" height="80"></td><td>Laís Cecília Soares Paes</td><td>211029512</td><td>Definição de Escopo do Projeto, Ajustes de Testes,<br>Desenvolvimento da Análise Semântica.</td></tr><tr><td><img src="https://avatars.githubusercontent.com/u/73966483?s=400&u=9370a079379c5c5891f9be5b51840a5f1ec50634&v=4" alt="Image" width="80" height="80"></td><td>Yves Gustavo Ribeiro Pimenta</td><td>190097043</td><td>Desenvolvimento da Análise Sintática e Semântica,<br>Geração de Código Intermediário e<br>Geração de Código Python.</td></tr></tbody></table>
 
-O trabalho consiste em implementar um compilador, dividido em duas etapas principais:
-1. Analisador Léxico (Lexer) – Responsável por ler o código fonte na linguagem C e quebrá-lo em tokens, utilizando Flex.
-2. Analisador Sintático (Parser) – Utiliza os tokens gerados para verificar se a estrutura do código está de acordo com a gramática definida, e em seguida traduz o código para a linguagem Python, utilizando Bison.
+## 📌 Funcionalidades Implementadas
 
-## ⚙️ Compilação e Execução
+O compilador atualmente suporta um subconjunto bem definido da linguagem C, traduzindo suas construções para Python.
 
-Para compilar e rodar o projeto, é necessário ter instalado:
-- Flex – para geração do analisador léxico
-- Bison – para geração do analisador sintático
-- GCC – para compilação do código em C
+1. Tipos e Declarações
+    - Suporte a int e float.
+
+    - Declarações com ou sem inicialização (incluindo múltiplas declarações com vírgula).
+
+    - Reconhecimento de literais inteiros, floats e strings.
+
+2. Operadores e Expressões
+    - Aritméticos: ```+```, ```-```, ```*```, ```/```, ```%```
+    
+    - Relacionais: ```==```, ```!=```, ```>```, ```<```, ```>=```, ```<=```
+    
+    - Lógicos: ``` &&```, ```||```, ```!```
+    
+    - Atribuição: ```=```
+
+    - Incremento/Decremento: ```x++```, ```x--``` (pós-fixados)
+
+3. Estruturas de Controle
+    - ```if```, ```if/else```
+    
+    - ```while```
+    
+    - ```do/while```
+    
+    - ```for```
+    
+    - ```switch/case```
+
+4. Entrada/Saída
+    - ```printf()``` → ```print()```
+    - ```scanf()``` → ```input()```
+
+## ⚠️ Limitações e Escopo Restrito
+O compilador foi projetado com escopo reduzido, portanto:
+- Não há suporte para: char, double, long, ponteiros, arrays.
+- Somente main() é suportada. Funções customizadas ainda não são traduzidas.
+- Pré-processamento é tratado de forma simplificada (#include, por exemplo).
+
+
+## ⚙️ Compilação e Execução com Makefile
+Certifique-se de ter instalado:
+- Flex — análise léxica
+
+- Bison — análise sintática
+
+- GCC — compilação dos módulos C
   
-### 1. Compilar arquivos Flex e Bison
-
+### Compilação (Gerando o Executável)
+Gera o executável c2py:
 ```
-flex lexer/lexer.l
-bison -d parser/parser.y
-```
-
-### 2. Compilar código C
-
-```
-gcc -o compilador lex.yy.c parser.tab.c -lfl
+make
 ```
 
-### 3. Executar programa compilado
-
+### Limpeza dos Artefatos
+Remove arquivos gerados automaticamente:
 ```
-./compilador
+make clean
 ```
 
+### Executar o Compilador
+Traduz um arquivo .c para Python:
+```
+./c2py <arquivo_entrada>.c > <arquivo_saida>.py
+```
 
+### Executar o código Python resultante
+```
+python3 <arquivo_saida>.py
+```
