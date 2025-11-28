@@ -2,9 +2,10 @@
 
 int main(){
 
-    // Operador Logico 1 (&&)
+    // Operador Logico 3 (and)
 
-    int num1 = 4, num2 = 1;
+    int num1 = 4;
+    int num2 = 1;
 
     if (num1 == 4 && num2 == 1){
         num2 = 2;

@@ -2,11 +2,12 @@
 
 int main(){
 
-    // Condicionais 1 (If..Else)
+    // Condicionais 2 (If..Else)
 
-    int num1 = 4, num2;
+    int num1 = 4;
+    int num2;
 
-    if (num1 == 3){
+    if (num1 == 4) {
         num2 = 1;
     } else {
         num2 = 2;

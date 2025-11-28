@@ -4,7 +4,9 @@ int main(){
 
     // Divisao de numeros inteiros
 
-    int num1 = 4, num2 = 2, divisao;
+    int num1 = 4;
+    int num2 = 2;
+    int divisao;
 
     divisao = num1 / num2;
  
